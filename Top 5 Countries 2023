@@ -1,0 +1,35 @@
+# Create chart with top 5 countries with highest coffee consumption as a percentage of total population in 2023.
+
+import zipfile
+import pandas as pd
+import os
+import matplotlib.pyplot as plt
+
+# Unzipping the provided file
+zip_path = '/mnt/data/archive.zip'
+unzip_dir = '/mnt/data/worldwide_coffee_habits/'
+
+with zipfile.ZipFile(zip_path, 'r') as zip_ref:
+    zip_ref.extractall(unzip_dir)
+
+# Load the dataset
+file_path = os.path.join(unzip_dir, 'worldwide_coffee_habits.csv')
+coffee_data = pd.read_csv(file_path)
+
+# Filter the data for the year 2023
+data_2023 = coffee_data[coffee_data['Year'] == 2023]
+
+# Calculate the total coffee consumption per country (kg per capita * population)
+data_2023['Total Coffee Consumption'] = data_2023['Coffee Consumption (kg per capita per year)'] * data_2023['Population (millions)']
+
+# Sort the data to find the top 5 countries with the highest total coffee consumption
+top_5_countries = data_2023.nlargest(5, 'Total Coffee Consumption')
+
+# Plot data
+plt.figure(figsize=(12, 8))
+plt.bar(top_5_countries['Country'], top_5_countries['Total Coffee Consumption'], color='skyblue')
+plt.xlabel('Country')
+plt.ylabel('Total Coffee Consumption (million kg)')
+plt.title('Top 5 Countries with Highest Coffee Consumption in 2023')
+plt.xticks(rotation=45)
+plt.show()
